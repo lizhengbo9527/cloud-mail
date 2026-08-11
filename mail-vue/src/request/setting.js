@@ -23,3 +23,7 @@ export function deleteBackground() {
 export function setBlackList(params) {
     return http.put('/setting/setBlacklist', params)
 }
+
+export function testTelegram(params) {
+    return http.post('/setting/testTelegram', params)
+}
