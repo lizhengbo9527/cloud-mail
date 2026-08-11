@@ -17,13 +17,20 @@ const CODE_LABEL_SOURCE = [
 	'authentication\\s+code',
 	'auth\\s+code',
 	'验证码',
+	'验证代码',
+	'一次性验证码',
+	'一次性代码',
 	'校验码',
 	'动态码',
 	'安全码',
+	'安全代码',
 	'登录码',
+	'登录代码',
 	'登入码',
 	'确认码',
+	'确认代码',
 	'认证码',
+	'认证代码',
 	'認証コード',
 	'確認コード',
 	'セキュリティコード',
@@ -40,7 +47,7 @@ const LOCAL_CODE_PATTERNS = [
 	new RegExp(`(?:enter|input|输入|请输入)\\s+(?:the\\s+)?(?:code|验证码|校验码|认证码|確認コード|認証コード)\\s*(?:[:：=\\-]\\s*)?${CODE_CANDIDATE_SOURCE}`, 'i')
 ];
 
-const VERIFICATION_HINT_RE = /(?:verification|verify|one[-\s]?time|otp|passcode|two[-\s]?factor|2fa|security\s+code|login\s+code|sign[-\s]?in|confirmation\s+code|authentication\s+code|验证码|校验码|动态码|安全码|登录码|登入码|确认码|认证码|一次性密码|二次验证|二步验证|認証|確認コード|ワンタイム|セキュリティコード)/i;
+const VERIFICATION_HINT_RE = /(?:verification|verify|one[-\s]?time|otp|passcode|two[-\s]?factor|2fa|security\s+code|login\s+code|sign[-\s]?in|confirmation\s+code|authentication\s+code|验证码|验证代码|一次性验证码|一次性代码|校验码|动态码|安全码|安全代码|登录码|登录代码|登入码|确认码|确认代码|认证码|认证代码|一次性密码|二次验证|二步验证|認証|確認コード|ワンタイム|セキュリティコード)/i;
 const CODE_CONTEXT_RE = /(?:your\s+(?:verification\s+|security\s+|login\s+|sign[-\s]?in\s+|confirmation\s+|authentication\s+)?code|temporary\s+(?:access\s+)?code)/i;
 
 export function normalizeCode(rawCode) {
