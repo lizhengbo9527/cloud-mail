@@ -114,10 +114,6 @@ function parseAiCode(result) {
 
 const aiService = {
 	async extractCode(c, email, options = {}) {
-		if (!this.shouldExtractCode(options.aiCode, options.aiCodeFilter, email)) {
-			return '';
-		}
-
 		try {
 			const subject = email.subject || '';
 			const text = emailUtils.formatText(email.text || '');
@@ -128,10 +124,15 @@ const aiService = {
 				return '';
 			}
 
-			// 优先使用确定性规则提取。常见验证码邮件完全不消耗 Workers AI 配额。
+			// 本地确定性规则始终优先执行，不依赖 Workers AI 开关或 AI 发件人过滤条件。
 			const localCode = extractCodeLocally(subject, body);
 			if (localCode) {
 				return localCode;
+			}
+
+			// 本地规则未命中后，AI 开关与发件人过滤条件仅决定是否允许使用 AI 兜底。
+			if (!this.shouldExtractCode(options.aiCode, options.aiCodeFilter, email)) {
+				return '';
 			}
 
 			// 普通邮件直接跳过 AI；只有疑似验证码邮件且本地规则未命中时才调用 AI 兜底。
