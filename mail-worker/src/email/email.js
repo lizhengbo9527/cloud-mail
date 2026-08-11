@@ -157,8 +157,8 @@ export async function email(message, env, ctx) {
 
 		}
 
-		//转发到TG
-		if (tgBotStatus === settingConst.tgBotStatus.OPEN && tgChatId) {
+		// 仅在识别到验证码时推送到 Telegram，普通邮件仍正常保存但不产生 Bot 通知。
+		if (tgBotStatus === settingConst.tgBotStatus.OPEN && tgChatId && emailRow.code) {
 			await telegramService.sendEmailToBot({ env }, emailRow)
 		}
 
