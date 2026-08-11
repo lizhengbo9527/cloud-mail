@@ -1094,15 +1094,14 @@ function resetNoticeForm() {
 }
 
 function saveNoticePopup() {
-  noticeForm.noticeContent = noticeForm.noticeContent || ''
-  noticeForm.noticeWidth = noticeForm.noticeWidth || 0
   noticeForm.noticeOffset = noticeForm.noticeOffset || 0
+  noticeForm.noticeWidth = noticeForm.noticeWidth || 0
   noticeForm.noticeDuration = noticeForm.noticeDuration || 0
   editSetting({...noticeForm})
 }
 
 function previewNoticePopup() {
-  uiStore.showNotice(noticeForm)
+  uiStore.previewNotice({...noticeForm})
 }
 
 function openThirdEmailSetting() {
@@ -1318,7 +1317,7 @@ function saveBlackList() {
     })
     blackFormShow.value = false;
   }).finally(() => {
-    settingLoading.value = false
+    settingLoading.value = false;
   })
 }
 
