@@ -45,7 +45,13 @@ const telegramService = {
 
 	async sendEmailToBot(c, email) {
 
-		const { tgBotToken, tgChatId, customDomain, tgMsgTo, tgMsgFrom, tgMsgText } = await settingService.query(c);
+		const { tgBotToken: savedTgBotToken, tgChatId, customDomain, tgMsgTo, tgMsgFrom, tgMsgText } = await settingService.query(c);
+		const tgBotToken = c.env.TG_BOT_TOKEN || savedTgBotToken;
+
+		if (!tgBotToken) {
+			console.error('转发 Telegram 失败: TG_BOT_TOKEN 未配置');
+			return;
+		}
 
 		const tgChatIds = tgChatId.split(',');
 
