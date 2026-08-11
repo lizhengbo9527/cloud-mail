@@ -566,9 +566,14 @@
           <div class="dialog-footer">
             <el-switch v-model="tgBotStatus" :active-value="0" :inactive-value="1" :active-text="$t('enable')"
                        :inactive-text="$t('disable')"/>
-            <el-button :loading="settingLoading" type="primary" @click="tgBotSave">
-              {{ $t('save') }}
-            </el-button>
+            <div>
+              <el-button :loading="tgTestLoading" :disabled="settingLoading" @click="testTelegramBot">
+                测试消息
+              </el-button>
+              <el-button :loading="settingLoading" type="primary" @click="tgBotSave">
+                {{ $t('save') }}
+              </el-button>
+            </div>
           </div>
         </template>
       </el-dialog>
@@ -805,7 +810,7 @@
 
 <script setup>
 import {computed, defineOptions, nextTick, reactive, ref} from "vue";
-import {deleteBackground, setBackground, setBlackList, settingQuery, settingSet} from "@/request/setting.js";
+import {deleteBackground, setBackground, setBlackList, settingQuery, settingSet, testTelegram} from "@/request/setting.js";
 import {useSettingStore} from "@/store/setting.js";
 import {useUiStore} from "@/store/ui.js";
 import {useUserStore} from "@/store/user.js";
@@ -852,6 +857,7 @@ const uiStore = useUiStore();
 const {settings: setting} = storeToRefs(settingStore);
 const editTitle = ref('')
 const settingLoading = ref(false)
+const tgTestLoading = ref(false)
 const clearS3Loading = ref(false)
 const r2DomainInput = ref('')
 const loginOpacity = ref(0)
@@ -1088,14 +1094,15 @@ function resetNoticeForm() {
 }
 
 function saveNoticePopup() {
-  noticeForm.noticeOffset = noticeForm.noticeOffset || 0
+  noticeForm.noticeContent = noticeForm.noticeContent || ''
   noticeForm.noticeWidth = noticeForm.noticeWidth || 0
+  noticeForm.noticeOffset = noticeForm.noticeOffset || 0
   noticeForm.noticeDuration = noticeForm.noticeDuration || 0
   editSetting({...noticeForm})
 }
 
 function previewNoticePopup() {
-  uiStore.previewNotice({...noticeForm})
+  uiStore.showNotice(noticeForm)
 }
 
 function openThirdEmailSetting() {
@@ -1207,6 +1214,36 @@ function tgBotSave() {
   editSetting(form)
 }
 
+function testTelegramBot() {
+  if (tgTestLoading.value) return
+
+  const chatIds = tgChatId.value.map(item => `${item}`.trim()).filter(Boolean)
+  if (chatIds.length === 0) {
+    ElMessage({
+      message: '请先填写 Telegram Chat ID',
+      type: 'warning',
+      plain: true
+    })
+    return
+  }
+
+  const form = {
+    tgChatId: chatIds.join(',')
+  }
+  if (tgBotToken.value) form.tgBotToken = tgBotToken.value
+
+  tgTestLoading.value = true
+  testTelegram(form).then(data => {
+    ElMessage({
+      message: `Telegram 测试消息发送成功（${data?.successCount || chatIds.length}/${data?.total || chatIds.length}）`,
+      type: 'success',
+      plain: true
+    })
+  }).finally(() => {
+    tgTestLoading.value = false
+  })
+}
+
 function forwardEmailSave() {
   const form = {
     forwardStatus: forwardStatus.value,
@@ -1281,7 +1318,7 @@ function saveBlackList() {
     })
     blackFormShow.value = false;
   }).finally(() => {
-    settingLoading.value = false;
+    settingLoading.value = false
   })
 }
 
