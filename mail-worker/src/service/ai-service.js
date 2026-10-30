@@ -97,7 +97,22 @@ export function isLikelyVerificationEmail(subject = '', body = '') {
 }
 
 function parseAiCode(result) {
-	const content = typeof result === 'string' ? result : result?.response || '';
+	// 兼容 Workers AI 返回 JSON 字符串、{ code } 或 { response: { code } }。
+	if (result && typeof result === 'object') {
+		if (typeof result.code === 'string') {
+			return normalizeCode(result.code);
+		}
+		if (result.response && typeof result.response === 'object'
+				&& typeof result.response.code === 'string') {
+			return normalizeCode(result.response.code);
+		}
+	}
+
+	const content = typeof result === 'string'
+		? result
+		: typeof result?.response === 'string'
+			? result.response
+			: '';
 	if (!content) {
 		return '';
 	}
@@ -146,7 +161,7 @@ const aiService = {
 				return '';
 			}
 
-			const result = await ai.run(c.env.ai_model || '@cf/meta/llama-3.1-8b-instruct', {
+			const result = await ai.run(c.env.ai_model || '@cf/meta/llama-3.1-8b-instruct-fast', {
 				messages: [
 					{
 						role: 'system',
